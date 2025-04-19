@@ -29,4 +29,4 @@ utm -a stop -c <class>
 ```
 
 ## Example 
-![Script Demo](images/example.png
+![Script Demo](images/example.png)
