@@ -16,8 +16,8 @@ $ sudo ln -sf /path/to/utm.sh /usr/local/bin/utm
 utm -h 
 
 # Start VMs for selected class
-utm -a start -c class
+utm -a start -c <class>
 
 # Stop VMs for selected class
-utm -a stop -c class
+utm -a stop -c <class>    
 ```
