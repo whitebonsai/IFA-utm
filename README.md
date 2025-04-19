@@ -27,3 +27,6 @@ utm -a start -c <class>
 # Stop VMs for selected class
 utm -a stop -c <class>    
 ```
+
+## Example 
+![Script Demo](images/example.png
