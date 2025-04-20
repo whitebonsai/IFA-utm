@@ -8,8 +8,8 @@
 # Description:     CLI Script to start UTM VMs based by Class
 # ===================================================================
 
-
 # to-do: implement delete action
+
 
 ##########################
 ### Preparation Tasks ####
@@ -18,7 +18,7 @@
 # Declare VMs, classes and actions array
 declare -a _IFA_VMS
 declare -a _IFA_CLASSES
-declare -a _UTM_ACTIONS=("start" "stop" "suspend")
+declare -a _UTM_ACTIONS=("start" "stop" "suspend" "status")
 
 # Search for IFA VMs and save to _IFA_VMS
 function funcCheckVmIFA() {
@@ -48,13 +48,18 @@ funcCheckClassesIFA
 ## COLORS ##
 ############
 
+# standard colors
 cOFF='\033[0m'			# color off / default color
-BON='\033[1m'			# bold text on
 rON='\033[0;31m'		# red color on
+mON='\033[0;35m'		# magenta color on
 gON='\033[0;32m'		# green color on
 bON='\033[0;34m'		# blue color on
 yON='\033[0;33m'		# yellow color on 
 BrON='\033[1;31m'		# bold red color on
+
+# bold colors
+BON='\033[1m'			# bold text on
+BmON='\033[1;35m'		# bold magenta color on
 BgON='\033[1;32m'		# bold green color on
 BbON='\033[1;34m'		# bold blue color on
 ByON='\033[1;33m'		# bold yellow color on 	 
@@ -84,7 +89,7 @@ function funcListActions() {
 function funcListVmByClass() {
 	for _class in "${_IFA_CLASSES[@]}"
 	do
-		echo -e "${BON}VMs for class:${cOFF} ${BbON}${_class}${cOFF}"
+		echo -e "${BON}VMs for class:${cOFF} ${BmON}${_class}${cOFF}"
 		for _vm in "${_IFA_VMS[@]}"
 		do
 			if [[ "${_vm: -4}" == "${_class}" ]]; then
@@ -107,6 +112,7 @@ function funcHelp(){
 	echo "EXAMPLE:"
 	echo "  utm -a start -c BMBS"
 	echo "  utm -a stop -c BMBS"
+	echo "  utm -a status -c BMBS"
 	echo ""
 	echo "OPTIONS:"
 	echo "  -l, list - List VMs sorted by Class"
@@ -201,16 +207,34 @@ function funcManageVms() {
 	local _action_opt=${1}
 	local _class_opt=${2}
 
-	echo -e "Working in class: ${BbON}${_class_opt}${cOFF}"
+	echo -e "Working in class: ${BmON}${_class_opt}${cOFF}"
 
 	for _vm in "${_IFA_VMS[@]}"
 	do
 		if [[ "${_vm: -4}" == "${_class_opt}" ]]; then
-			utmctl "${_action_opt}" "${_vm}"
 			case "${_action_opt}" in
-				start) echo -e "  ${BgON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
-				stop) echo -e "  ${BrON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
-				suspend) echo -e "  ${ByON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
+				start)
+					$(utmctl "${_action_opt}" "${_vm}")
+					echo -e "  ${BgON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}"
+					;;
+				stop)
+					$(utmctl "${_action_opt}" "${_vm}")
+					echo -e "  ${BrON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}"
+					;;
+				suspend)
+					$(utmctl "${_action_opt}" "${_vm}")
+					echo -e "  ${ByON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}"
+					;;
+				status)
+					_status=$(utmctl "${_action_opt}" "${_vm}")
+					case "${_status}" in
+						started)
+							echo -e "  ${BON}*${cOFF} ${BbON}"${_vm}${cOFF}": ${BgON}${_status}${cOFF}";;
+						stopped)
+							echo -e "  ${BON}*${cOFF} ${BbON}"${_vm}${cOFF}": ${BrON}${_status}${cOFF}";;
+						paused)
+							echo -e "  ${BON}*${cOFF} ${BbON}"${_vm}${cOFF}": ${ByON}${_status}${cOFF}";;
+					esac
 			esac
 		fi
 	done

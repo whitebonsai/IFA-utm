@@ -25,7 +25,10 @@ utm -h
 utm -a start -c <class>
 
 # Stop VMs for selected class
-utm -a stop -c <class>    
+utm -a stop -c <class>   
+
+# Check VMs status for selected class
+utm -a status -c <class>
 ```
 
 ## Example 
