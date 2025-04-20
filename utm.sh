@@ -8,8 +8,11 @@
 # Description:     CLI Script to start UTM VMs based by Class
 # ===================================================================
 
-
 # to-do: implement delete action
+# known status: stopped
+# known status: started
+# kown status: paused
+
 
 ##########################
 ### Preparation Tasks ####
@@ -18,7 +21,7 @@
 # Declare VMs, classes and actions array
 declare -a _IFA_VMS
 declare -a _IFA_CLASSES
-declare -a _UTM_ACTIONS=("start" "stop" "suspend")
+declare -a _UTM_ACTIONS=("start" "stop" "suspend" "status")
 
 # Search for IFA VMs and save to _IFA_VMS
 function funcCheckVmIFA() {
@@ -107,6 +110,7 @@ function funcHelp(){
 	echo "EXAMPLE:"
 	echo "  utm -a start -c BMBS"
 	echo "  utm -a stop -c BMBS"
+	echo "  utm -a status -c BMBS"
 	echo ""
 	echo "OPTIONS:"
 	echo "  -l, list - List VMs sorted by Class"
@@ -206,11 +210,22 @@ function funcManageVms() {
 	for _vm in "${_IFA_VMS[@]}"
 	do
 		if [[ "${_vm: -4}" == "${_class_opt}" ]]; then
-			utmctl "${_action_opt}" "${_vm}"
 			case "${_action_opt}" in
-				start) echo -e "  ${BgON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
-				stop) echo -e "  ${BrON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
-				suspend) echo -e "  ${ByON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
+				start)
+					$(utmctl "${_action_opt}" "${_vm}")
+					echo -e "  ${BgON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}"
+					;;
+				stop)
+					$(utmctl "${_action_opt}" "${_vm}")
+					echo -e "  ${BrON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}"
+					;;
+				suspend)
+					$(utmctl "${_action_opt}" "${_vm}")
+					echo -e "  ${ByON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}"
+					;;
+				status)
+					_status=$(utmctl "${_action_opt}" "${_vm}")
+					echo "  ${_vm}: ${_status}"
 			esac
 		fi
 	done
