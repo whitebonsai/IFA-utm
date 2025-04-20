@@ -9,9 +9,6 @@
 # ===================================================================
 
 # to-do: implement delete action
-# known status: stopped
-# known status: started
-# kown status: paused
 
 
 ##########################
@@ -51,13 +48,18 @@ funcCheckClassesIFA
 ## COLORS ##
 ############
 
+# standard colors
 cOFF='\033[0m'			# color off / default color
-BON='\033[1m'			# bold text on
 rON='\033[0;31m'		# red color on
+mON='\033[0;35m'		# magenta color on
 gON='\033[0;32m'		# green color on
 bON='\033[0;34m'		# blue color on
 yON='\033[0;33m'		# yellow color on 
 BrON='\033[1;31m'		# bold red color on
+
+# bold colors
+BON='\033[1m'			# bold text on
+BmON='\033[1;35m'		# bold magenta color on
 BgON='\033[1;32m'		# bold green color on
 BbON='\033[1;34m'		# bold blue color on
 ByON='\033[1;33m'		# bold yellow color on 	 
@@ -87,7 +89,7 @@ function funcListActions() {
 function funcListVmByClass() {
 	for _class in "${_IFA_CLASSES[@]}"
 	do
-		echo -e "${BON}VMs for class:${cOFF} ${BbON}${_class}${cOFF}"
+		echo -e "${BON}VMs for class:${cOFF} ${BmON}${_class}${cOFF}"
 		for _vm in "${_IFA_VMS[@]}"
 		do
 			if [[ "${_vm: -4}" == "${_class}" ]]; then
@@ -205,7 +207,7 @@ function funcManageVms() {
 	local _action_opt=${1}
 	local _class_opt=${2}
 
-	echo -e "Working in class: ${BbON}${_class_opt}${cOFF}"
+	echo -e "Working in class: ${BmON}${_class_opt}${cOFF}"
 
 	for _vm in "${_IFA_VMS[@]}"
 	do
@@ -225,7 +227,14 @@ function funcManageVms() {
 					;;
 				status)
 					_status=$(utmctl "${_action_opt}" "${_vm}")
-					echo "  ${_vm}: ${_status}"
+					case "${_status}" in
+						started)
+							echo -e "  ${BON}*${cOFF} ${BbON}"${_vm}${cOFF}": ${BgON}${_status}${cOFF}";;
+						stopped)
+							echo -e "  ${BON}*${cOFF} ${BbON}"${_vm}${cOFF}": ${BrON}${_status}${cOFF}";;
+						paused)
+							echo -e "  ${BON}*${cOFF} ${BbON}"${_vm}${cOFF}": ${ByON}${_status}${cOFF}";;
+					esac
 			esac
 		fi
 	done
